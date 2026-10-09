@@ -151,6 +151,23 @@ npx ng serve
 
 The frontend API base URL is configured in `client/src/environments/environment.ts` (or the environment file used by this project). Ensure it points to the backend URL.
 
+## Live Deployment
+
+- **Frontend (Vercel):** https://m-ploy-check-assignment-accesshub.vercel.app/
+- **Login page:** https://m-ploy-check-assignment-accesshub.vercel.app/login
+- **Backend (Render):** https://mploycheck-assignment-accesshub.onrender.com
+- **Health check:** https://mploycheck-assignment-accesshub.onrender.com/api/health
+
+The Angular frontend is hosted on Vercel and calls the Express API hosted on Render. The backend's `CLIENT_URL` environment variable should be set to:
+
+```text
+https://m-ploy-check-assignment-accesshub.vercel.app
+```
+
+Do not include `/login` or a trailing slash in `CLIENT_URL`. The backend also requires its MongoDB connection string and a strong, private `JWT_SECRET` to be configured in Render's environment settings. Never commit production secrets to the repository.
+
+Render free-tier services may take a short time to wake after inactivity. If the first API request is slow, wait briefly and retry.
+
 ## Seed / Demo Accounts
 
 The development seed data used during testing included these accounts:
@@ -255,7 +272,7 @@ Build and test results can change after code edits; rerun these checks before su
 - Add pagination and server-side search for larger user and record collections.
 - Add rate limiting, audit logging, and security monitoring.
 - Add automated frontend tests and end-to-end tests.
-- Deploy the frontend and backend with production environment variables and HTTPS.
+- Keep production environment variables configured in Vercel and Render, and verify the live deployment after each release.
 - Add password reset and account lifecycle workflows if required by the product.
 
 ## Repository
