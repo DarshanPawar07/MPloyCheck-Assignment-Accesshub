@@ -1,0 +1,190 @@
+<div class="dashboard-shell">
+  <aside class="sidebar">
+   
+<a class="brand" routerLink="/dashboard" aria-label="AccessHub home">
+  <span class="brand-icon">
+    <img src="/favicon.png" alt="" />
+  </span>
+  <span class="brand-name">AccessHub</span>
+</a>
+
+
+    <div class="nav-label">WORKSPACE</div>
+
+    <a class="nav-item active" routerLink="/dashboard">
+      <span class="nav-icon">▦</span>
+      <span>My dashboard</span>
+    </a>
+
+    <div class="sidebar-note">
+      <span class="note-icon">✦</span>
+      <strong>Your workspace, simplified.</strong>
+      <p>Access your records and understand your permissions from one place.</p>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="security-indicator">
+        <span class="security-dot"></span>
+        <span>Secure workspace</span>
+      </div>
+      <button class="logout-button" type="button" (click)="logout()">
+        <span>↪</span> Sign out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="breadcrumb">
+        <span>Workspace</span>
+        <span class="breadcrumb-separator">/</span>
+        <strong>My dashboard</strong>
+      </div>
+
+      <div class="topbar-user" *ngIf="user">
+        <div class="user-avatar">{{ getInitials(user.name) }}</div>
+        <div class="user-details">
+          <strong>{{ user.name }}</strong>
+          <span>General user</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <div class="welcome-row">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR WORKSPACE</div>
+          <h1>Good to see you, {{ firstName }}<span class="heading-period">.</span></h1>
+          <p class="welcome-subtitle">
+            Here's an overview of your records and access permissions.
+          </p>
+        </div>
+
+        <button class="refresh-button" type="button"
+          (click)="loadRecords()" [disabled]="isLoading">
+          <span [class.spinning]="isLoading">↻</span>
+          Refresh
+        </button>
+      </div>
+
+      <div class="summary-grid">
+        <article class="summary-card">
+          <div class="summary-top">
+            <span class="summary-label">Total records</span>
+            <span class="summary-icon icon-indigo">▤</span>
+          </div>
+          <div class="summary-value">{{ records.length }}</div>
+          <div class="summary-foot">Records available to you</div>
+        </article>
+
+        <article class="summary-card">
+          <div class="summary-top">
+            <span class="summary-label">Active records</span>
+            <span class="summary-icon icon-green">✓</span>
+          </div>
+          <div class="summary-value">{{ activeCount }}</div>
+          <div class="summary-foot"><span class="status-dot green-dot"></span> Currently active</div>
+        </article>
+
+        <article class="summary-card">
+          <div class="summary-top">
+            <span class="summary-label">Read access</span>
+            <span class="summary-icon icon-blue">◉</span>
+          </div>
+          <div class="summary-value">{{ records.length - writeAccessCount }}</div>
+          <div class="summary-foot">Read-only permissions</div>
+        </article>
+
+        <article class="summary-card">
+          <div class="summary-top">
+            <span class="summary-label">Write access</span>
+            <span class="summary-icon icon-amber">✎</span>
+          </div>
+          <div class="summary-value">{{ writeAccessCount }}</div>
+          <div class="summary-foot">Records with edit permission</div>
+        </article>
+      </div>
+
+      <section class="records-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Your records</h2>
+            <p>Records assigned to your account and their current permissions.</p>
+          </div>
+          <span class="record-count">{{ records.length }} records</span>
+        </div>
+
+        <div class="loading-state" *ngIf="isLoading">
+          <span class="loader"></span>
+          <strong>Loading your records</strong>
+          <p>Getting the latest information from your workspace...</p>
+        </div>
+
+        <div class="error-state" *ngIf="!isLoading && errorMessage">
+          <span class="state-icon error-icon">!</span>
+          <h3>Couldn't load records</h3>
+          <p>{{ errorMessage }}</p>
+          <button class="primary-button" type="button" (click)="loadRecords()">
+            Try again
+          </button>
+        </div>
+
+        <div class="empty-state" *ngIf="!isLoading && !errorMessage && records.length === 0">
+          <span class="empty-illustration">▤</span>
+          <h3>No records yet</h3>
+          <p>There are no records available for your account right now.</p>
+        </div>
+
+        <div class="table-wrapper" *ngIf="!isLoading && !errorMessage && records.length > 0">
+          <table>
+            <thead>
+              <tr>
+                <th>RECORD</th>
+                <th>DEPARTMENT</th>
+                <th>ACCESS LEVEL</th>
+                <th>STATUS</th>
+                <th>CREATED</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of records">
+                <td>
+                  <div class="record-title-cell">
+                    <span class="record-symbol">▤</span>
+                    <div class="record-text">
+                      <strong>{{ record.title }}</strong>
+                      <span>{{ record.description }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="department-label">{{ record.department }}</span></td>
+                <td>
+                  <span class="access-badge"
+                    [class.write-access]="record.accessLevel === 'WRITE'">
+                    <span>{{ record.accessLevel === 'WRITE' ? '✎' : '◉' }}</span>
+                    {{ record.accessLevel === 'WRITE' ? 'Write' : 'Read only' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge"
+                    [class.inactive-status]="record.status === 'INACTIVE'">
+                    <span class="status-dot"></span>
+                    {{ record.status === 'ACTIVE' ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="date-cell">{{ formatDate(record.createdAt) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel-footer" *ngIf="!isLoading && !errorMessage && records.length > 0">
+          <span>Showing {{ records.length }} records available to your account</span>
+          <span class="footer-secure"><span class="security-dot"></span> Access-controlled</span>
+        </div>
+      </section>
+
+     
+    </section>
+  </main>
+</div>
